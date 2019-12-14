@@ -166,7 +166,7 @@
 
 
     function editRecords(event) {
-       
+
         event.preventDefault();
         const getPromise = performAjax("GET", `http://localhost:8888/Supervisor/editProduct/${event.target.id}`);
         getPromise
@@ -191,10 +191,15 @@
         const id = document.getElementById("id").value;
         const category = document.getElementById("category").value;
         const subCategory = document.getElementById("subCategory").value;
+        const productName = document.getElementById("productName").value;
+        const price = document.getElementById("price").value;
+        const modal = document.getElementById("modal").value;
+        const description = document.getElementById("description").value;
+
         const getPromise = performAjax(
             "PUT",
-            `http://localhost:8888/Supervisor/updateSubCategory/${id}`,
-            JSON.stringify({ category, subCategory })
+            `http://localhost:8888/Supervisor/updateProduct/${id}`,
+            JSON.stringify({ subCategory, productName, price, modal, description })
         );
         getPromise
             .then((Promise) => {

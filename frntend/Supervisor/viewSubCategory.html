@@ -165,12 +165,14 @@
         const getPromise = performAjax(
             "PUT",
             `http://localhost:8888/Supervisor/updateSubCategory/${id}`,
-            JSON.stringify({ category,subCategory})
+            JSON.stringify({subCategory})
         );
         getPromise
-            .then((Promise) => {
-                loadData();
+            .then((obj) => {
+                console.log(obj);
                 alert('Update Successfully');
+                loadData();
+
             })
             .catch(err => {
                 alert(err.message);
