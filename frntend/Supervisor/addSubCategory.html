@@ -1,0 +1,109 @@
+<html>
+
+<head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <br>
+        <center>
+            <h2>Add Sub Category</h2>
+        </center><br>
+</head>
+
+<body onload="loadData()" class="container"><br><br>
+
+    <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-2"><label for="">Category</label></div>
+            <div class="col-md-3"><select class="form-control"  id="category">
+                    <option value="">--select--</option>
+                </select></div>
+            <div class="col-md-4"></div>
+        </div><br>
+            <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-2"><label for="">Sub Category</label></div>
+                    <div class="col-md-3"><input type="text" class="form-control" name="" id="subCategory"
+                           ></div>
+                    <div class="col-md-4"></div>
+                </div><br>
+                <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">   <button class="btn btn-primary button" onclick="SubCategory()" type="button">Add</button><br><br></div>
+        <div class="col-md-4"></div>
+    </div>
+</body>
+<script>
+  
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(JSON.parse(this.responseText));
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getPromise = performAjax("GET", "http://localhost:8888/Supervisor/categoryData");
+        getPromise
+            .then((List) => {
+                loadCategoryData(List);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+    function loadCategoryData(data) {
+        let name = document.getElementById("category");
+        const getdata = JSON.parse(JSON.stringify(data));
+        for (let i = 0; i < getdata.length; i++) {
+            const curentItem = document.createElement("OPTION");
+            curentItem.innerHTML = getdata[i].category;
+            curentItem.value = getdata[i]._id;
+            name.options.add(curentItem);
+
+        }
+    }
+
+
+
+    function SubCategory() {
+        const category = document.getElementById("category").value;
+        const subCategory = document.getElementById("subCategory").value;
+                const getSendFilePromise = performAjax(
+                    "POST",
+                    `http://localhost:8888/Supervisor/addSubCategory`,
+                    JSON.stringify({  category, subCategory })
+                );
+                getSendFilePromise
+                    .then((sendFilePromise) => {
+                        alert('Added  Successfully');
+                        cancel();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    })
+    }
+   
+    function cancel() {
+        event.preventDefault();
+        document.getElementById("category").value = "";
+        document.getElementById("subCategory").value = "";
+    }
+
+</script>
+
+</html>

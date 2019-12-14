@@ -1,0 +1,184 @@
+<html>
+
+<head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <br>
+        <center>
+            <h2>Add Sub Category</h2>
+        </center><br>
+</head>
+
+<body onload="loadData()" class="container"><br><br>
+
+    <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-2"><label for="">Category</label></div>
+            <div class="col-md-3"><select class="form-control" onchange="ac()" id="category">
+                    <option value="">--select--</option>
+                </select></div>
+            <div class="col-md-4"></div>
+        </div><br>
+        <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-2"><label for="">subCategory</label></div>
+                <div class="col-md-3"><select class="form-control"  id="subCategory">
+                        <option value="">--select--</option>
+                    </select></div>
+                <div class="col-md-4"></div>
+            </div><br>
+            <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-2"><label for="">productName</label></div>
+                    <div class="col-md-3"><input type="text" class="form-control" name="" id="productName"
+                           ></div>
+                    <div class="col-md-4"></div>
+                </div><br>
+                <div class="row">
+                        <div class="col-md-3"></div>
+                        <div class="col-md-2"><label for="">price</label></div>
+                        <div class="col-md-3"><input type="text" class="form-control" name="" id="price"
+                               ></div>
+                        <div class="col-md-4"></div>
+                    </div><br>
+                    <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-2"><label for="">modal</label></div>
+                            <div class="col-md-3"><input type="text" class="form-control" name="" id="modal"
+                                   ></div>
+                            <div class="col-md-4"></div>
+                        </div><br>
+                        <div class="row">
+                                <div class="col-md-3"></div>
+                                <div class="col-md-2"><label for="">description</label></div>
+                                <div class="col-md-3"><input type="text" class="form-control" name="" id="description"
+                                       ></div>
+                                <div class="col-md-4"></div>
+                            </div><br>
+                <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4">   <button class="btn btn-primary button" onclick="Products()" type="button">Add</button><br><br></div>
+        <div class="col-md-4"></div>
+    </div>
+</body>
+<script>
+  
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(JSON.parse(this.responseText));
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getPromise = performAjax("GET", "http://localhost:8888/Supervisor/categoryData");
+        getPromise
+            .then((List) => {
+                loadCategoryData(List);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+   
+    function loadCategoryData(data) {
+        let name = document.getElementById("category");
+        const getdata = JSON.parse(JSON.stringify(data));
+        for (let i = 0; i < getdata.length; i++) {
+            const curentItem = document.createElement("OPTION");
+            curentItem.innerHTML = getdata[i].category;
+            curentItem.value = getdata[i]._id;
+            name.options.add(curentItem);
+            }
+            const options = []
+
+            document.querySelectorAll('#subject > option').forEach((option) => {
+                if (options.includes(option.value)) option.remove()
+                else options.push(option.value)
+            })
+
+        }
+        function ac(value) {
+            const category = document.getElementById("category").value;
+            const getPromise = performAjax("GET", `http://localhost:8888/Supervisor/getSubCategoryData?category=${category}`);
+            getPromise
+                .then((details) => {
+                    console.log(details);
+                    const data = JSON.parse(JSON.stringify(details));
+                    data.map(rec => {
+                        let question = document.getElementById("subCategory").value = rec.subCategory;
+                        var select = document.getElementById("subCategory");
+                        var length = select.options.length;
+                        for (i = 0; i < length; i++) {
+                            select.options[i] = null;
+                        }
+                        for (let i = 0; i < data.length; i++) {
+                            var opt = new Option(data[i].subCategory);
+
+                            $("#subCategory").append(opt);
+                        }
+                        const options = []
+                        document.querySelectorAll('#subCategory > option').forEach((option) => {
+                            if (options.includes(option.value)) option.remove()
+                            else options.push(option.value)
+                        })
+
+                    })
+                })
+                .catch(err => {
+                    alert(err.message);
+                })
+
+
+        }
+
+    function Products() {
+        const category = document.getElementById("category").value;
+        const subCategory = document.getElementById("subCategory").value;
+        const productName = document.getElementById("productName").value;
+        const price = document.getElementById("price").value;
+        const modal = document.getElementById("modal").value;
+        const description = document.getElementById("description").value;
+                const getSendFilePromise = performAjax(
+                    "POST",
+                    `http://localhost:8888/Supervisor/addProduct`,
+                    JSON.stringify({  category, subCategory,productName,price ,modal,description})
+                );
+                getSendFilePromise
+                    .then((sendFilePromise) => {
+                        alert('Added  Successfully');
+                        cancel();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    })
+    }
+   
+    function cancel() {
+        event.preventDefault();
+        document.getElementById("category").value = "";
+        document.getElementById("subCategory").value = "";
+        document.getElementById("productName").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("modal").value = "";
+        document.getElementById("description").value = "";
+    }
+
+</script>
+
+</html>

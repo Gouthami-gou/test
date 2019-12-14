@@ -1,0 +1,92 @@
+<html>
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<br>
+<center>
+    <h2>Supervisor Registartion</h2>
+</center><br>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2"><label for="">Full Name</label></div>
+    <div class="col-md-3"><input type="text" class="form-control" name="fname" id="name"
+            placeholder="enter ur fullname"></div>
+    <div class="col-md-4"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2"><label for="">phone</label></div>
+    <div class="col-md-3"><input type="number" class="form-control" name="phone" id="phone"
+            placeholder="enter ur phoneno"></div>
+    <div class="col-md-4"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-2"><label for="">Email Id</label></div>
+    <div class="col-md-3"><input type="text" class="form-control" name="email" id="email"
+            placeholder="enter ur emailid"></div>
+    <div class="col-md-4"></div>
+</div><br>
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-3"><button type="button" class="btn btn-info" onclick="Register()">Register</button></div>
+    <div class="col-sm-1"><button type="button" id="cancel" style="display: none;" onclick="cancel()"
+            class="btn btn-success">Reset</button>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function Register() {
+        const name = document.getElementById("name").value;
+        const phone = document.getElementById("phone").value;
+        const email = document.getElementById("email").value;
+        const password = Math.floor((Math.random() * 1000) + 1);
+        const getRegPromise = performAjax(
+            "POST",
+            `http://localhost:8888/Admin/addSupervisor`,
+            JSON.stringify({ name, phone, email, password})
+        );
+        getRegPromise
+            .then((regPromise) => {
+                alert('Registration Successfully Completed');
+                cancel();
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function cancel() {
+        event.preventDefault();
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("email").value = "";
+     
+    }
+</script>
+
+</html>
