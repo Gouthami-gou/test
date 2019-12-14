@@ -157,7 +157,7 @@
                 const getSendFilePromise = performAjax(
                     "POST",
                     `http://localhost:8888/Supervisor/addProduct`,
-                    JSON.stringify({  category, subCategory,productName,price ,modal,description})
+                    JSON.stringify({category, subCategory,productName,price ,modal,description})
                 );
                 getSendFilePromise
                     .then((sendFilePromise) => {
